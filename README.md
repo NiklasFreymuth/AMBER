@@ -114,8 +114,8 @@ visualizations of your tasks, plots over time and more.
 The `src` folder contains the source code of this project, separated into the following subfolders:
 * `algorithms` contains the AMBER and CNN baseline algorithms.
 * `environments` contains the geometry and PDE definitions.
-* `hmpn` contains the message passing network
-* `modules` contains additional pytorch modules
+* `hmpn` contains the message passing network.
+* `modules` contains additional pytorch modules.
 * `recording` contains the logger for all console outputs, different scalar metrics and task-dependent visualizations per iteration.
 
 ### Util
