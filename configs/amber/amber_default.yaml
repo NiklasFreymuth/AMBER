@@ -1,0 +1,187 @@
+# Horeka
+name: "SLURM"   # MUST BE "SLURM"
+
+# Required
+partition: "cpuonly"
+job-name: "AMBER"    # this will be the experiment name in slurm
+num_parallel_jobs: 0
+time: 3000 # in minutes
+cpus-per-task: 76
+ntasks: 1
+
+sbatch_args: # Dictionary of SBATCH keywords and arguments
+  distribution: block  # To have repetitions of the same exp be distributed to different nodes
+  nodes: 1
+slurm_log: "./slurmlog"     # optional. dir in which slurm output and error logs will be saved.
+sh_lines: [ "export WANDB_DIR=$TMPDIR/wandb", "mkdir $WANDB_DIR" ]
+---
+repetitions: 10
+reps_per_job: 8
+reps_in_parallel: 8
+iterations: 1001
+
+name: "DEFAULT"   # MUST BE DEFAULT
+import_path: "../default.yaml"
+params:
+  recording:
+    wandb:
+      enabled: True  # whether to use the wandb logger or not
+      plot_frequency: 200  # If wandb is enabled, how often to log plots online. High frequencies take up a lot of space.
+      plot_first_iteration: False  # whether to plot the first iteration or not. This is useful if you want to
+      # reduce the number of plots that are logged to wandb
+      project_name: AMBER  # name of the project
+      task_name: default
+      tags: [ "amber" ]  # list of custom tags to sort/find these runs by
+      use_env_wandb_dir: True  # whether to use the os environment's wandb directory or the default one.
+      # If True and such an environment variable is not set, the default directory will be used
+    checkpoint_frequency: 200
+  task:
+    fem:
+      domain:
+        dimension: 2
+
+        # rest is pde-specific
+        domain_type: lshape
+        mean_hole_size: 0.15
+        maximum_position_distortion: 0.3  # distortion for the l-shape
+
+        num_boundary_nodes: 10
+        maximum_distortion: 0.1
+      pde_type: poisson  # either poisson, laplace, stokes_flow, linear_elasticity or heat_diffusion
+      poisson:
+        fixed_load: False
+
+        # gmm parameters
+        density_mode: density  # either "density" or "log_density"
+        num_components: 3  # number of GMM components
+        distance_threshold: 0.0  # minimum distance between the means of the GMM components
+        mean_position_range: 0.4  # maximum deviation range of the gmm mean from (0.5, 0.5)
+        lower_covariance_bound: 0.0001  # minimum value of the isotropic covariance matrix
+        upper_covariance_bound: 0.001  # maximum value of the isotropic covariance matrix
+
+        element_features:
+          load_function: True
+    element_features:
+      x_position: False
+      y_position: False
+      volume: True
+      solution_mean: True
+      solution_std: True
+    edge_features:
+      distance_vector: False
+      euclidean_distance: True
+
+    expert_data:
+      mesh_dataset_name: "heuristic"
+
+      heuristic:
+        smooth_mesh: True
+        refinement_steps: 40
+        error_threshold: 0.8  # threshold for the error metric.
+        # If the error for an element is below this threshold, this element will not be refined
+        # A lower threshold will thus lead to more refinement.
+      num_train_pdes: 20  # number of PDEs to train on
+      num_val_pdes: 20  # number of PDEs to validate on
+      num_test_pdes: 100 # number of PDEs to test on
+      max_initial_element_volume: 0.1
+
+
+  algorithm:
+    name: amber
+    verbose: True
+    batch_size: auto  # number of data points to process per training batch.
+    # "auto" will use as many points of data as fit on the gpu, or 100k by if on CPU.
+    # Any integer number be treated as the maximum number of graphs per batch. For efficiency, will take graphs until
+    # their cumulative number of elements reaches batch_size*max_mesh_elements.
+    use_gpu: True
+    max_gpu_split_size_mb: 512  # maximum size of an allocated chunk on the GPU in mb. May help reduce fragmentation
+    data_loader_on_gpu: False  # iff use_gpu, decide whether the sample buffer should be on the gpu or not
+
+
+    supervised:
+      max_buffer_size: 1000  # maximum number of samples to store in the replay buffer
+      batches_per_iteration: 256  # number of batches to sample from the replay buffer per iteration
+      max_grad_norm: 0.5  # maximum norm of the gradients
+      normalizer:
+        normalize_observations: 1  # whether to normalize the observations or not. If True, will use a running mean
+        normalize_predictions: 0  # whether to normalize the predictions or not. If True, will use a running mean
+        observation_clip: 20  # maximum value of the observations. If the abs observations are larger than this value,
+          # they will be clipped to this value
+      evaluation_idxs: [0, 1]  # indices of the dataset to use for evaluation.
+      inference_steps: 5  # how often to repeat the refinement procedure for during evaluation.
+      buffer_add_frequency: 8  # how often to add new samples to the replay buffer.
+        # if 0, will not add samples to the buffer
+        # Is not tracked between iteration, so should be set to a divisor of batches_per_iteration
+      buffer_add_strategy: stratified  # either "random" or "stratified".
+        # If "random", will add random samples to the buffer
+        # If "stratified", determines a valid depth first and then takes a sample with this depth
+      max_buffer_mesh_depth: 5 # maximum depth of the mesh to store in the buffer. Depth refers to the number of
+        # refinement steps that have been applied to the mesh, i.e., to the number of inference steps the algorithm
+        # has executed on the mesh. Will add new samples that never exceed this depth.
+      max_mesh_elements: auto # Maximum number of elements per mesh.
+        # During training, estimates the number of elements for a new mesh and creates it iff it is small enough
+        # May be
+        # * some integer, such as 15000 for meshes <=15k elements
+        # * "auto" to create meshes with up to max(expert_mesh_elements)*1.2 elements
+        # * None to disable this feature
+      sizing_field_interpolation_type: mean  # How to interpolate the sizing field. Can be either
+        # "min", "midpoint", "mean", or "max".
+        # "min": For each coarse element, the sizing field equals the minimum of the expert sizing field evaluated at
+        #    all elements whose midpoint is contained in the coarse element. This is the most aggressive
+        #    sizing field estimate, and essentially guaranteed to over-refine everywhere. It also takes the
+        #    smallest number of inference iterations (namely 2) to converge to the expert sizing field from any
+        #    initial guess.
+        # "mean": For each coarse element, the sizing field equals the mean of the expert sizing field evaluated at
+        #   all elements whose midpoint is contained in the coarse element. As a coarse element can contain more
+        #   small than large elements, this mean will be biased towards small fields, essentially taking a geometric
+        #   average.
+
+        # "max": For each coarse element, the sizing field equals the maximum of the expert sizing field evaluated at
+        #     all elements whose midpoint is contained in the coarse element. This is the most conservative
+        #     sizing field estimate, and essentially guaranteed to not over-refine anywhere. It also takes the largest
+        #     number of inference iterations to converge to the expert sizing field.
+      loss_type: mse  # either of "mse" or "nmse" for a (normalized) mean squared error loss
+      transform_predictions: softplus  # Either False/null for no transform,
+      # "softplus" to make sure that the predicted fields are non-negative, or
+      # "exp" to learn log-sizing fields but predict the sizing field/compute the loss directly
+
+      min_sizing_field: auto
+      # either a number that denotes the smallest allowed edge length or "auto" to determine this value
+      # from sizing fields of the expert dataset. If "auto", the smallest edge length of the expert dataset
+      # will be used as the minimum edge length.
+
+    network:
+      latent_dimension: 64
+      type_of_base: hmpn  # which general backbone to use. MPN forwards to HMPN package/repo
+      base:
+        scatter_reduce: mean
+        create_graph_copy: True  # whether to create a copy of the used graph before the forward pass or not
+        assert_graph_shapes: False  # whether to assert correct shapes for the graph before each forward pass or not
+        edge_dropout: 0.1  # dropout rate for the edges of the graph. Will remove the edge from the graph
+        # with the given probability during training only
+        stack:  # used for mpn
+          layer_norm: inner   # which kind of layer normalization to use. null/None for no layer norm,
+        # "outer" for layer norm around each full message passing step, "inner" for layer norm after each message
+          num_steps: 10
+          num_step_repeats: 1  # how often to repeat the message passing step
+          residual_connections: inner
+          node_update_type: message_passing  # either "message_passing" or "gat"
+          attention_heads: 2  # number of attention heads for the gat
+          mlp:
+            activation_function: leakyrelu
+            num_layers: 2
+            add_output_layer: False
+            regularization:
+              dropout: 0
+              spectral_norm: False
+              latent_normalization: null
+      decoder:
+        mlp:
+          activation_function: tanh
+          num_layers: 2
+      training:
+        learning_rate: 3.0e-4
+        weight_decay: 0
+        optimizer: adam  # adam, adamw, or sgd
+        lr_scheduling_rate: 1  # Rate for an exponential learning rate annealing after every outer *iteration*.
+        # None or 1 for no scheduling. A value of 0.99 corresponds to a 1% decrease in LR every iteration.

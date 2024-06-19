@@ -1,0 +1,49 @@
+# Horeka
+name: "SLURM"   # MUST BE "SLURM"
+
+# Required
+partition: "cpuonly"
+job-name: "GNNs"    # this will be the experiment name in slurm
+num_parallel_jobs: 0
+time: 3000 # in minutes
+cpus-per-task: 76
+ntasks: 1
+
+sbatch_args: # Dictionary of SBATCH keywords and arguments
+  distribution: block  # To have repetitions of the same exp be distributed to different nodes
+  nodes: 1
+slurm_log: "./slurmlog"     # optional. dir in which slurm output and error logs will be saved.
+sh_lines: [ "export WANDB_DIR=$TMPDIR/wandb", "mkdir $WANDB_DIR" ]
+---
+repetitions: 1
+reps_per_job: 1
+reps_in_parallel: 1
+iterations: 1001
+
+name: "DEFAULT"   # MUST BE DEFAULT
+import_path: "amber_default.yaml"
+params:
+  recording:
+    wandb:
+      enabled: True
+      plot_frequency: 5
+      plot_first_iteration: True
+      task_name: test
+    checkpoint_frequency: 50
+---
+iterations: 101
+name: amber_test
+params:
+  task:
+    expert_data:
+      mesh_dataset_name: "heuristic"
+      heuristic:
+        smooth_mesh: True
+        refinement_steps: 25 # 50
+        error_threshold: 0.8  # threshold for the error metric.
+        # If the [0,1]-normalized error for an element is below this threshold, this element will not be refined
+      num_train_pdes: 10
+      num_val_pdes: 1
+      num_test_pdes: 1
+      # max_initial_element_volume: 0.002
+
