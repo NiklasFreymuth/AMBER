@@ -13,7 +13,7 @@ AMBER combines a graph neural network with an online data acquisition scheme to 
 This iterative process ensures efficient and accurate imitation of expert mesh resolutions on arbitrary new geometries during inference.
 We experimentally validate AMBER on heuristic $2$D meshes and $3$D meshes provided by a human expert, closely matching the provided demonstrations and outperforming a single-step CNN baseline.
 
-![AMBER Schematic](AMBER_schematic.png).
+![AMBER Schematic](AMBER_schematic.png)
 
 # Getting Started
 
