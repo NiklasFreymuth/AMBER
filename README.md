@@ -1,6 +1,6 @@
-# AMBER
+# Adaptive Meshing By Expert Reconstruction (AMBER)
 
-Adaptive Meshing By Expert Reconstruction (AMBER)
+[Iterative Sizing Field Prediction for Adaptive Mesh Generation From Expert Demonstrations](https://arxiv.org/abs/2406.14161)
 
 ##  Abstract
 Many engineering systems require accurate simulations of complex physical systems. 
@@ -13,7 +13,7 @@ AMBER combines a graph neural network with an online data acquisition scheme to 
 This iterative process ensures efficient and accurate imitation of expert mesh resolutions on arbitrary new geometries during inference.
 We experimentally validate AMBER on heuristic $2$D meshes and $3$D meshes provided by a human expert, closely matching the provided demonstrations and outperforming a single-step CNN baseline.
 
-Click here for the [AMBER Schematic](AMBER_schematic.pdf).
+![AMBER Schematic](AMBER_schematic.png).
 
 # Getting Started
 
@@ -122,3 +122,13 @@ The `src` folder contains the source code of this project, separated into the fo
 
 Common utilities used by the entire source-code can be found here. This includes additions to torch that we need,
 or common definitions.
+
+# Cite
+Please cite this work as
+@article{freymuth2024iterative,
+  title={Iterative Sizing Field Prediction for Adaptive Mesh Generation From Expert Demonstrations},
+  author={Freymuth, Niklas and Dahlinger, Philipp and W{\"u}rth, Tobias and Becker, Philipp and Taranovic, Aleksandar and Gr{\"o}nheim, Onno and K{\"a}rger, Luise and Neumann, Gerhard},
+  journal={AI4Science Workshop at  at International Conference on Machine Learning (ICML)},
+  year={2024}
+}
+
