@@ -125,10 +125,12 @@ or common definitions.
 
 # Cite
 Please cite this work as
+```
 @article{freymuth2024iterative,
   title={Iterative Sizing Field Prediction for Adaptive Mesh Generation From Expert Demonstrations},
   author={Freymuth, Niklas and Dahlinger, Philipp and W{\"u}rth, Tobias and Becker, Philipp and Taranovic, Aleksandar and Gr{\"o}nheim, Onno and K{\"a}rger, Luise and Neumann, Gerhard},
   journal={AI4Science Workshop at  at International Conference on Machine Learning (ICML)},
   year={2024}
 }
+```
 
