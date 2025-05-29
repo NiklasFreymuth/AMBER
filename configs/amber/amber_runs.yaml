@@ -1,0 +1,162 @@
+# "accelerated" uses v100 with 32gb of vRAM
+# "accelerated-h100" uses h100 with 80gb of vRAM
+name: "SLURM"   # MUST BE "SLURM"
+partition: "accelerated-h100"
+job-name: "AMBER"
+time: 2880  # in minutes
+ntasks: 1
+num_parallel_jobs: 0
+cpus-per-task: 64
+scheduler: "horeka"
+gpus_per_rep: 1
+sbatch_args:
+  gres: "gpu:4"
+slurm_log: "./slurmlog"     # optional. dir in which slurm output and error logs will be saved.
+sh_lines: [ "export WANDB_DIR=$TMPDIR/wandb", "mkdir $WANDB_DIR" ]
+
+
+---
+repetitions: 4
+reps_per_job: 4
+reps_in_parallel: 4
+iterations: 501
+
+name: "DEFAULT"   # MUST BE DEFAULT
+import_path: "amber_default.yaml"
+params:
+  recording:
+    wandb:
+      enabled: True
+      plot_frequency: 100
+      plot_first_iteration: False
+      task_name: workshop
+    checkpoint_frequency: 100
+
+---
+name: amber_poisson
+params:
+  task:
+    expert_data:
+      mesh_dataset_name: "heuristic"
+      heuristic:
+        smooth_mesh: True
+        refinement_steps: 75
+        error_threshold: 0.80
+      num_train_pdes: 20
+
+list:
+  algorithm:
+    supervised:
+      loss_type: [ mse, log_mse ]
+      transform_predictions: [ softplus, null ]
+
+grid:
+  algorithm:
+    supervised:
+      sizing_field_interpolation_type: [ max, mean ]
+  task:
+    expert_data:
+      heuristic:
+        refinement_steps: [ 25, 50, 75 ]
+
+---
+name: amber_console
+iterations: 501
+params:
+  task:
+    fem:
+      domain:
+        dimension: 3
+        domain_type: step_file_domain
+      pde_type: null
+
+    element_features:
+      x_position: False
+      y_position: False
+      volume: True
+      solution_mean: False
+      solution_std: False
+    edge_features:
+      distance_vector: True
+      euclidean_distance: False
+
+    expert_data:
+      mesh_dataset_name: "console"
+      num_train_pdes: 15
+      num_val_pdes: 2
+      num_test_pdes: 5
+      max_initial_element_volume: 10
+      console:
+        folder_path: "console"
+
+  algorithm:
+    network:
+      latent_dimension: 128
+list:
+  algorithm:
+    supervised:
+      loss_type: [ mse, log_mse ]
+      transform_predictions: [ softplus, null ]
+
+grid:
+  algorithm:
+    supervised:
+      sizing_field_interpolation_type: [ max, mean ]
+
+---
+name: amber_poisson_abl
+params:
+  recording:
+    wandb:
+      plot_frequency: 500
+  task:
+    expert_data:
+      mesh_dataset_name: "heuristic"
+      heuristic:
+        smooth_mesh: True
+        refinement_steps: 75
+        error_threshold: 0.80
+      num_train_pdes: 20
+  algorithm:
+    supervised:
+      loss_type: mse
+      transform_predictions: softplus
+      sizing_field_interpolation_type: max
+      buffer_add_strategy: stratified
+
+ablative:
+  algorithm:
+    supervised:
+      transform_predictions: [ null ]
+      buffer_add_strategy: [ random ]
+      normalizer:
+        normalize_observations: [ 0 ]
+
+---
+name: amber_poisson_samples
+params:
+  recording:
+    wandb:
+      plot_frequency: 500
+  task:
+    expert_data:
+      mesh_dataset_name: "heuristic"
+      heuristic:
+        smooth_mesh: True
+        refinement_steps: 75
+        error_threshold: 0.80
+      num_train_pdes: 20
+  algorithm:
+    supervised:
+      loss_type: mse
+      transform_predictions: softplus
+      sizing_field_interpolation_type: max
+      buffer_add_strategy: stratified
+
+grid:
+  task:
+    expert_data:
+      num_train_pdes: [ 5, 10, 50, 100 ]
+      heuristic:
+        refinement_steps: [ 75 ]
+

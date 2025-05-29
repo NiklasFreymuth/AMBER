@@ -1,0 +1,150 @@
+# "accelerated" uses v100 with 32gb of vRAM
+# "accelerated-h100" uses h100 with 80gb of vRAM
+name: "SLURM"   # MUST BE "SLURM"
+partition: "accelerated"
+job-name: "ImageAmber"
+time: 1440 # in minutes
+ntasks: 1
+num_parallel_jobs: 0
+cpus-per-task: 64
+scheduler: "horeka"
+gpus_per_rep: 1
+sbatch_args:
+  gres: "gpu:4"
+slurm_log: "./slurmlog"     # optional. dir in which slurm output and error logs will be saved.
+sh_lines: [ "export WANDB_DIR=$TMPDIR/wandb", "mkdir $WANDB_DIR" ]
+
+
+---
+repetitions: 4
+reps_per_job: 4
+reps_in_parallel: 4
+iterations: 101
+
+name: "DEFAULT"   # MUST BE DEFAULT
+import_path: "image_amber_default.yaml"
+params:
+  recording:
+    wandb:
+      enabled: True
+      plot_frequency: 100
+      plot_first_iteration: False
+      task_name: workshop
+    checkpoint_frequency: 100
+
+---
+name: imamber_poisson
+params:
+  task:
+    expert_data:
+      mesh_dataset_name: "heuristic"
+      heuristic:
+        smooth_mesh: True
+        refinement_steps: 75
+        error_threshold: 0.80
+      num_train_pdes: 20
+
+    element_features:
+      volume: False
+
+  algorithm:
+    supervised:
+      image_resolution: 64
+      sizing_field_interpolation_type: "mean"
+      loss_type: log_mse
+      transform_predictions: null
+      normalizer:
+        normalize_observations: 1
+    network:
+      type_of_base: unet
+      initial_channels: 64
+      depth: 4
+
+grid:
+  algorithm:
+    supervised:
+      image_resolution: [ 32, 64, 128, 256, 512 ]
+  task:
+    expert_data:
+      heuristic:
+        refinement_steps: [ 25, 50, 75 ]
+
+---
+name: imamber_console
+params:
+  task:
+    fem:
+      domain:
+        dimension: 3
+        domain_type: step_file_domain
+      pde_type: null
+
+    element_features:
+      x_position: False
+      y_position: False
+      volume: False
+      solution_mean: False
+      solution_std: False
+
+    expert_data:
+      mesh_dataset_name: "console"
+      num_train_pdes: 15
+      num_val_pdes: 2
+      num_test_pdes: 5
+      max_initial_element_volume: 10
+      console:
+        folder_path: "console"
+
+  algorithm:
+    supervised:
+      image_resolution: 64
+      sizing_field_interpolation_type: "mean"
+      normalizer:
+        normalize_observations: 1
+    network:
+      type_of_base: unet
+      initial_channels: 64
+      depth: 4
+
+
+grid:
+  algorithm:
+    supervised:
+      image_resolution: [ 32, 64 ]
+    network:
+      initial_channels: [ 64, 128 ]
+
+---
+name: imamber_poisson_abl
+params:
+  task:
+    expert_data:
+      mesh_dataset_name: "heuristic"
+      heuristic:
+        smooth_mesh: True
+        refinement_steps: 75
+        error_threshold: 0.80
+      num_train_pdes: 20
+
+    element_features:
+      volume: False
+
+  algorithm:
+    supervised:
+      image_resolution: 256
+      sizing_field_interpolation_type: "mean"
+      loss_type: mse
+      transform_predictions: null
+      normalizer:
+        normalize_observations: 1
+    network:
+      type_of_base: unet
+      initial_channels: 64
+      depth: 4
+
+list:
+  algorithm:
+    supervised:
+      loss_type: [ log_mse, mse, mse ]
+      sizing_field_interpolation_type: [ max, mean, mean ]
+      transform_predictions: [ null, softplus, null ]

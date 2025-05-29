@@ -1,0 +1,238 @@
+from dataclasses import dataclass
+from os import PathLike
+from typing import Dict, Optional, Type, Union
+
+import numpy as np
+from skfem import Element, MeshTet1
+
+
+@dataclass(repr=False)
+class ExtendedMeshTet1(MeshTet1):
+    """
+    A wrapper/extension of the Scikit FEM MeshTri1 that allows for more flexible mesh initialization.
+    This class allows for arbitrary sizes and centers of the initial meshes, and offers utility for different initial
+    mesh types.
+
+    """
+
+    def __init__(self, *args, **kwargs):
+        """
+        """
+        self._geom_fn = None
+        self._geom_bounding_box = None
+        super().__init__(*args, **kwargs)
+
+    @classmethod
+    def init_from_geom(
+            cls: Type["ExtendedMeshTet1"],
+            step_file_path: str = None,
+            max_element_volume: float = 0.01,
+            *args,
+            **kwargs,
+    ) -> "ExtendedMeshTet1":
+        """
+        Initialize a mesh from a .step file stored at step_file_path.
+        Args:
+            step_file_path:
+            max_element_volume:
+            *args:
+            **kwargs:
+
+        Returns:
+
+        """
+        assert not kwargs, f"No keyword arguments allowed, given '{kwargs}'"
+        assert not args, f"No positional arguments allowed, given '{args}'"
+
+        from src.environments.domains.gmsh_util import generate_initial_mesh, step_file_geom
+        from src.algorithms.amber.amber_util import volume_to_edge_length
+
+        geom_fn = lambda: step_file_geom(step_file_path=step_file_path)
+        desired_element_size = volume_to_edge_length(max_element_volume, dim=3)
+        mesh = generate_initial_mesh(geom_fn, desired_element_size, dim=3, target_class=cls)
+
+        return mesh
+
+    @property
+    def geom_fn(self):
+        assert self._geom_fn is not None, "Geometry function not set."
+        return self._geom_fn
+
+    @geom_fn.setter
+    def geom_fn(self, value):
+        self._geom_fn = value
+
+    @property
+    def geom_bounding_box(self):
+        assert self._geom_bounding_box is not None, "Bounding box not set."
+        return self._geom_bounding_box
+
+    @geom_bounding_box.setter
+    def geom_bounding_box(self, value):
+        self._geom_bounding_box = value
+
+    def refined(self, times_or_ix: Union[int, np.ndarray] = 1):
+        """Return a refined ExtendedMeshTet1.
+
+        Parameters
+        ----------
+        times_or_ix
+            Either an integer giving the number of uniform refinements or an
+            array of element indices for adaptive refinement.
+
+        """
+        m = self
+        if isinstance(times_or_ix, int):
+            for _ in range(times_or_ix):
+                m = m._uniform()
+        else:
+            m = m._adaptive(times_or_ix)
+        return m
+
+    def element_finder(self, mapping=None):
+        """
+        Find the element that contains the points [(x, y, z)]. Returns -1 if the point is in no element
+        Args:
+            mapping: A mapping from the global node indices to the local node indices. Currently not used
+
+        Returns:
+
+        """
+        from pykdtree.kdtree import KDTree
+        from src.environments.util.point_in_3d_geometry import points_in_tetrahedra
+
+        tree = KDTree(np.mean(self.p[:, self.t], axis=1).T)
+        nelems = self.t.shape[1]
+        elements = self.p[:, self.t].T
+
+        fibonacci = [1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144]
+
+        def finder(x, y, z, try_brute_force: bool = False, _k: int = 1, _brute_force: bool = False):
+            """
+            For each point in (x,y,z), find the element that contains this point.
+            Returns -1 for points that are not in any element
+            Args:
+                x: Array of point x coordinates of shape (num_points, )
+                y: Array of point y coordinates of shape (num_points, )
+                z: Array of point z coordinates of shape (num_points, )
+                try_brute_force: If True, resort to brute force if the KD Tree fails to find the element.
+                _k: fib(_k) is the number of elements to consider for each point, where fib is the fibonacci sequence.
+                   Only used if _brute_force is False.
+                   Will do iterative passes over _k={1,2,3,4,5} before doing a brute force.
+                _brute_force: If True, use the brute force variant. If False, use the KDTree to select candidates.
+                Internal parameter that is used to switch between the two algorithms as a backup if the KDTree fails.
+
+            Returns:
+
+            """
+            if _brute_force:
+                if try_brute_force:
+                    # brute force approach - check all elements
+                    element_indices = points_in_tetrahedra(points=np.array([x, y, z]).T,
+                                                           tetrahedra=elements,
+                                                           candidate_indices=None,
+                                                           )
+                else:
+                    element_indices = np.ones(x.shape[0], dtype=np.int64) * -1
+            else:
+                # find candidate elements
+                num_candidates = min(fibonacci[_k], nelems)
+
+                # use the KDTree to find the elements with the closest center
+                distances, candidate_indices = tree.query(np.array([x, y, z]).T, num_candidates)
+                # usually (distance, index), but we only care about the indices
+
+                if _k > 1:
+                    # only use the last half as the previous half was considered in the previous iteration
+                    candidate_indices = candidate_indices[:, fibonacci[_k - 1]:]
+                # cast to int64 for compatibility reasons
+                candidate_indices = candidate_indices.astype(np.int64)
+
+                # try to find the right element for each point using the KDTree candidates
+                element_indices = points_in_tetrahedra(
+                    points=np.array([x, y, z]).T,
+                    tetrahedra=elements,
+                    candidate_indices=candidate_indices,
+                )
+
+                # fallback to brute force search for elements that were not found in the KDTree
+                invalid_elements = element_indices == -1
+                if invalid_elements.any():
+                    if _k < len(fibonacci) -1:
+                        element_indices[invalid_elements] = finder(
+                            x=x[invalid_elements],
+                            y=y[invalid_elements],
+                            z=z[invalid_elements],
+                            _k=_k + 1,
+                            _brute_force=False,
+                        )
+                    else:
+                        element_indices[invalid_elements] = finder(
+                            x=x[invalid_elements],
+                            y=y[invalid_elements],
+                            z=z[invalid_elements],
+                            _brute_force=True,
+                        )
+
+            return element_indices
+
+        return finder
+
+    def __post_init__(self):
+        """
+        Copied over to remove warning
+        """
+        if self.sort_t:
+            self.t = np.sort(self.t, axis=0)
+
+        self.doflocs = np.asarray(self.doflocs, dtype=np.float64, order="K")
+        self.t = np.asarray(self.t, dtype=np.int64, order="K")
+
+        M = self.elem.refdom.nnodes
+
+        if self.nnodes > M and self.elem is not Element:
+            # reorder DOFs to the expected format: vertex DOFs are first
+            # note: not run if elem is not set
+            p, t = self.doflocs, self.t
+            t_nodes = t[:M]
+            uniq, ix = np.unique(t_nodes, return_inverse=True)
+            self.t = np.arange(len(uniq), dtype=np.int64)[ix].reshape(t_nodes.shape)
+            doflocs = np.hstack(
+                (
+                    p[:, uniq],
+                    np.zeros((p.shape[0], np.max(t) + 1 - len(uniq))),
+                )
+            )
+            doflocs[:, self.dofs.element_dofs[M:].flatten("F")] = p[:, t[M:].flatten("F")]
+            self.doflocs = doflocs
+
+        # C_CONTIGUOUS is more performant in dimension-based slices
+        if not self.doflocs.flags["C_CONTIGUOUS"]:
+            self.doflocs = np.ascontiguousarray(self.doflocs)
+
+        if not self.t.flags["C_CONTIGUOUS"]:
+            self.t = np.ascontiguousarray(self.t)
+
+    def save(
+            self,
+            filename: Union[str, PathLike],
+            point_data: Optional[Dict[str, np.ndarray]] = None,
+            cell_data: Optional[Dict[str, np.ndarray]] = None,
+            **kwargs,
+    ) -> None:
+        """Export the mesh and fields using meshio.
+
+        Parameters
+        ----------
+        filename
+            The output filename, with suffix determining format;
+            e.g. .msh, .vtk, .xdmf
+        point_data
+            Data related to the vertices of the mesh.
+        cell_data
+            Data related to the elements of the mesh.
+
+        """
+        from skfem.io.meshio import to_file
+
+        return to_file(MeshTet1(self.p, self.t), filename, point_data, cell_data, **kwargs)

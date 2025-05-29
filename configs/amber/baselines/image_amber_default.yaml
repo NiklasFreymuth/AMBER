@@ -1,0 +1,33 @@
+# Horeka
+name: "SLURM"   # MUST BE "SLURM"
+
+# Required
+partition: "cpuonly"
+job-name: "AMBER"    # this will be the experiment name in slurm
+num_parallel_jobs: 0
+time: 3000 # in minutes
+cpus-per-task: 76
+ntasks: 1
+
+sbatch_args: # Dictionary of SBATCH keywords and arguments
+  distribution: block  # To have repetitions of the same exp be distributed to different nodes
+  nodes: 1
+slurm_log: "./slurmlog"     # optional. dir in which slurm output and error logs will be saved.
+sh_lines: [ "export WANDB_DIR=$TMPDIR/wandb", "mkdir $WANDB_DIR" ]
+---
+name: "DEFAULT"   # MUST BE DEFAULT
+import_path: "../amber_default.yaml"
+params:
+  algorithm:
+    name: image_amber
+
+    supervised:
+      image_resolution: 64
+
+    network:
+      type_of_base: unet  # which general backbone to use. MPN forwards to HMPN package/repo
+      initial_channels: 32
+      depth: 4
+      latent_dimension: null
+      base: null
+      decoder: null

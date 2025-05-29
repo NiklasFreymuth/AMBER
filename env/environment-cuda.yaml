@@ -1,0 +1,34 @@
+name: AMBER_cuda
+
+channels:
+  - default
+  - pytorch
+  - nvidia
+  - conda-forge
+
+dependencies:
+  - python=3.10
+  - numpy=1.22.3
+  - numba=0.56.4
+  - scipy=1.10.1
+  - scikit-learn=1.0.2
+  - wandb=0.16.5
+  - tqdm=4.63.0
+  - plotly=5.6
+  - shapely=1.8.2
+  - meshio=5.3.4
+  - pydantic=1.10.7
+  - tikzplotlib=0.10.1
+  - pytorch=2.1.2
+  - pytorch-cuda=12.1
+  - torchvision==0.16.2
+  - torchaudio==2.1.2
+  - pip=22.0.4
+  - pre-commit==3.4.0
+  - pip:
+      - -r ./requirements-cuda.txt
+
+# pytorch related installs may not work on windows. These include pytorch, pyg and stable-baselines3.
+# see e.g., https://pytorch-geometric.readthedocs.io/en/latest/notes/installation.html
+# pip install torch-scatter torch-sparse torch-cluster torch-spline-conv torch-geometric -f https://data.pyg.org/whl/torch-1.11.0+cpu.html
+# pip install stable-baselines3
