@@ -8,7 +8,7 @@ For the earlier workshop version of AMBER, see the ```workshop``` branch and the
 ## Setting up the environment
 
 ### Mamba
-This project uses mamba (https://github.com/conda-forge/miniforge)/conda (https://docs.conda.io/en/latest/) and pip for handling packages and dependencies.
+This project uses [mamba](https://github.com/conda-forge/miniforge) / [conda](https://docs.conda.io/en/latest/) and pip for handling packages and dependencies.
 To install mamba on Linux-like OSes use one of the commands below.
 
 ```
