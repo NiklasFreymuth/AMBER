@@ -1,0 +1,17 @@
+defaults:
+  - default_task
+  - _self_
+
+
+name: console
+num_data_points:
+  train: 19
+  val: 2
+  test: 5
+
+extensions:  # File extensions to figure out what to load
+  mesh: nas
+  geometry: step
+max_initial_element_volume: 2
+
+

@@ -1,0 +1,17 @@
+# @package _global_
+
+defaults:
+  - _amber
+  - override /task: airfoil
+  - _self_
+
+exp_name: amber_airfoil
+_version: 1
+idx: amb100
+
+hydra:
+  sweeper:
+    ablative_params:
+      - algorithm.inference_steps: 1
+        task.max_initial_element_volume: 0.0003
+        idx: stp100

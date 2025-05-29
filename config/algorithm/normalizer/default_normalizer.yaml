@@ -1,0 +1,5 @@
+normalize_inputs: 1  # whether to normalize the inputs/observations or not. If True, will use a running mean
+normalize_predictions: 1  # whether to normalize the predictions or not. If True, will use a running mean
+input_clip: 20  # maximum value of the inputs *after* normalization.
+  # If the absolute inputs are larger than this value, they will be clipped to this value. This essentially
+  # weakly prevents the models from going super out of distribution, but is not a hard constraint.

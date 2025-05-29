@@ -1,0 +1,14 @@
+
+accelerator: ???
+precision: ???
+matmul_precision: ???
+devices: 1
+accumulate_grad_batches: 1
+check_val_every_n_epoch: 1
+fast_dev_run: False
+num_sanity_val_steps: 2
+gradient_clip_val: 0.5
+enable_checkpointing: True
+checkpoint_frequency: 200
+max_epochs: 201
+torch_compile: False  # whether to run torch.compile before starting the training

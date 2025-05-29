@@ -1,0 +1,39 @@
+# @package _global_
+
+defaults:
+  - _image
+  - override /task: poisson
+  - _self_
+
+exp_name: image_poisson
+_version: 1
+
+algorithm:
+  max_mesh_elements: x10  # allow for way more elements, as this is sometimes relevant for easier poisson tasks to avoid max_element limits
+idx: iam100
+
+task:
+  max_initial_element_volume: auto
+hydra:
+  sweeper:
+    ablative_params:
+      - task.refinement_heuristic.refinement_steps: 25
+        idx: iam100e  # "e" for "easy"
+      - task.refinement_heuristic.refinement_steps: 50
+        idx: iam100m  # "m" for "medium"
+
+      # Image Baseline
+      - algorithm.normalizer.normalize_inputs: 0
+        algorithm.normalizer.normalize_predictions: 0
+        algorithm.prediction_transform.inverse_transform_in_loss: False
+        idx: img100
+      - algorithm.normalizer.normalize_inputs: 0
+        algorithm.normalizer.normalize_predictions: 0
+        algorithm.prediction_transform.inverse_transform_in_loss: False
+        task.refinement_heuristic.refinement_steps: 25
+        idx: img100e
+      - algorithm.normalizer.normalize_inputs: 0
+        algorithm.normalizer.normalize_predictions: 0
+        algorithm.prediction_transform.inverse_transform_in_loss: False
+        task.refinement_heuristic.refinement_steps: 50
+        idx: img100m

@@ -1,0 +1,6 @@
+activation_function: leakyrelu
+num_layers: 2
+regularization:
+  dropout: 0
+  spectral_norm: False
+  latent_normalization: null

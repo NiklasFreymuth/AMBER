@@ -1,0 +1,32 @@
+defaults:
+  - default_algorithm
+  - override architecture: mpn
+  - override dataloader: amber_dataloader
+  - _self_
+
+name: amber
+
+prediction_transform:
+  inverse_transform_in_loss: True
+  predict_residual: True
+  name: softplus
+
+loss_type: mse
+sizing_field_interpolation_type: sampled_vertex
+initial_mesh_handling: topology_only  # Determines how the initial mesh is included in the graph construction.
+# - 'exclude': Do not include the initial mesh.
+# - 'topology_only': Include the initial mesh as a higher-level graph layer without computing features (topology only).
+# - 'full': Include both topology and features for the initial mesh.
+# Including the initial mesh creates a hierarchical graph that enables high-level communication across the fine mesh.
+inference_steps: 3  # how often to repeat the refinement procedure for during evaluation.
+
+sizing_field_damping:
+  last_step_damping: 1.0  # How to scale the sizing field globally for the last step of all meshes and steps.
+    # 1.0 means that we do not do any damping by default.
+  damping_factor: 0.618
+    # damping factor for the refinement procedure to reduce the elements in early iterations.
+    # A value of 0 corresponds to no damping
+    # A value >0 will dampen the refinement procedure by setting the sizing field at step n to
+    # sf_n <-- sf_n/damping_factor^(n-N), where N is the maximum number of steps.
+    # Will randomly sample a damping factor from the interval [0, damping] during data collection
+    # We set this to the golden ratio by default to balance stability and speed of convergence

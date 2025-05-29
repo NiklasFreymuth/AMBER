@@ -1,0 +1,7 @@
+
+steps_per_epoch: 128
+accumulate_grad_batches: ${trainer.accumulate_grad_batches}
+# runs a total of steps_per_epoch * accumulate_grad_batches mini batches per epoch for steps_per_epoch gradient steps
+batch_size: ???  # number of data points to process per training batch.
+# For AMBER, this refers to the number of graph nodes + number of graph edges.
+# For ImageAMBER, it is the number of images.

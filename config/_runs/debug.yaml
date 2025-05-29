@@ -1,0 +1,36 @@
+# @package _global_
+
+defaults:
+  - override /algorithm: amber
+  - override /task: poisson
+  - override /trainer: cpu_trainer  # Either "cpu_trainer" or "gpu_trainer"
+  - _self_
+
+exp_name: debug
+trainer:
+  max_epochs: 20
+algorithm:
+
+  # Use a small GNN for debugging
+  architecture:
+    stack:
+      num_steps: 2
+
+  # Plot frequently
+  plotting:
+    frequency: 2
+
+task:
+  # Use reduced data
+  num_data_points:
+    train: 10
+    val: 5
+    test: 5
+  refinement_heuristic:
+    refinement_steps: 25
+# Only run 1 seed
+hydra:
+  sweeper:
+    grid_params:
+      seed: 0
+

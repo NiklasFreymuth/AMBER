@@ -1,0 +1,12 @@
+defaults:
+  - load_function: high_covariance_gmm  # strictly speaking not a load function, but the function that induces the dirichlet boundary conditions
+  - _self_
+name: laplace  # either poisson, laplace, stokes_flow, linear_elasticity or heat_diffusion
+solution_dimension: 1  # dimension of the fem solution per vertex. 1 for scalar fields, >=2 for vector fields.
+
+pde_features:
+  vertex:
+    solution: True
+  element:
+    solution_mean: True
+    solution_std: True

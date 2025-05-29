@@ -1,0 +1,5 @@
+defaults:
+  - default_trainer
+accelerator: cpu
+precision: 32
+matmul_precision: null

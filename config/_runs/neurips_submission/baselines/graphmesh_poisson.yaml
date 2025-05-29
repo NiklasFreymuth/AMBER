@@ -1,0 +1,74 @@
+# @package _global_
+
+defaults:
+  - override /algorithm: graphmesh
+  - override /task: poisson
+  - override /trainer: gpu_trainer
+  - _self_
+
+# Graphmesh baseline for the Poisson 2D task. This baseline is only applicable to poisson, as it needs a boundary
+# polygon for its preprocessing.
+# See https://www.iccs-meeting.org/archive/iccs2024/papers/148360114.pdf for the paper
+
+exp_name: graphmesh_poisson
+_version: 1
+
+idx: grm100
+
+trainer:
+  max_epochs: 101
+algorithm:
+  plotting:
+    frequency: 100
+  max_mesh_elements: x10  # allow for way more elements to not run into any bounds here, i.e., allow for basically infinite elements.
+task:
+  max_initial_element_volume: 0.00003  # for 25 steps/easy.
+
+hydra:
+  sweeper:
+    grid_params:
+      seed: 0, 1, 2, 3, 4
+
+    ablative_params:
+      # Run "our" and "their" variant of this algorithm
+      - task.max_initial_element_volume: 0.0005
+        task.refinement_heuristic.refinement_steps: 25
+        trainer.max_epochs: 26
+        algorithm.plotting.frequency: 25
+        idx: grm100e
+      - task.max_initial_element_volume: 0.0001
+        task.refinement_heuristic.refinement_steps: 50
+        trainer.max_epochs: 51
+        algorithm.plotting.frequency: 50
+        idx: grm100m
+
+      # Below are changes to turn it into "our" variant, which are a bunch of QoL things that we do
+      - algorithm.normalizer.normalize_inputs: 1
+        algorithm.normalizer.normalize_predictions: 1
+        algorithm.loss_type: mse
+        algorithm.prediction_transform.inverse_transform_in_loss: True
+        algorithm.architecture.num_steps: 20
+        algorithm.architecture.latent_dimension: 64
+        idx: grm101
+      - algorithm.normalizer.normalize_inputs: 1
+        algorithm.normalizer.normalize_predictions: 1
+        algorithm.loss_type: mse
+        algorithm.prediction_transform.inverse_transform_in_loss: True
+        algorithm.architecture.num_steps: 20
+        algorithm.architecture.latent_dimension: 64
+        task.max_initial_element_volume: 0.0005
+        task.refinement_heuristic.refinement_steps: 25
+        trainer.max_epochs: 26
+        algorithm.plotting.frequency: 25
+        idx: grm101e
+      - algorithm.normalizer.normalize_inputs: 1
+        algorithm.normalizer.normalize_predictions: 1
+        algorithm.loss_type: mse
+        algorithm.prediction_transform.inverse_transform_in_loss: True
+        algorithm.architecture.num_steps: 20
+        algorithm.architecture.latent_dimension: 64
+        task.max_initial_element_volume: 0.0001
+        task.refinement_heuristic.refinement_steps: 50
+        trainer.max_epochs: 51
+        algorithm.plotting.frequency: 50
+        idx: grm101m

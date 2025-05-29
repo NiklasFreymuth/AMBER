@@ -1,0 +1,4 @@
+# Default parameters from the image_baseline paper (https://arxiv.org/pdf/2102.12923)
+name: unet
+initial_channels: 64
+depth: 5

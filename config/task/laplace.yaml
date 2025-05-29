@@ -1,0 +1,15 @@
+defaults:
+  - default_task
+  - fem: laplace
+  - domain: lattice
+  - refinement_heuristic: theta_heuristic
+  - _self_
+
+
+name: laplace
+
+num_data_points:
+  train: 20  # number of data points to train on
+  val: 20
+  test: 20
+max_initial_element_volume: 0.001

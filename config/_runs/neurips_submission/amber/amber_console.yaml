@@ -1,0 +1,42 @@
+# @package _global_
+
+defaults:
+  - _amber
+  - override /task: console
+  - _self_
+
+exp_name: amber_console
+_version: 1
+
+trainer:
+  max_epochs: 401
+idx: amb100
+
+hydra:
+  sweeper:
+    ablative_params:
+      # 1-step
+      - algorithm.inference_steps: 1
+        idx: stp100
+        # uses same volume as main amber, as this was optimal for the beam task
+
+      # Design ablations
+      - algorithm.initial_mesh_handling: exclude  # non-hierarchical
+        idx: des100
+      - algorithm.sizing_field_damping.damping_factor: 0.0  # no scaling
+        idx: des101
+      - algorithm.prediction_transform.predict_residual: False  # no baseline/residual prediction
+        idx: des102
+      - algorithm.prediction_transform.inverse_transform_in_loss: False  # no softplus transformed loss
+        idx: des103
+      - algorithm.normalizer.normalize_inputs: 0  # no normalization
+        algorithm.normalizer.normalize_predictions: 0
+        idx: des104
+      - algorithm.dataloader.add_strategy: random  # no stratified buffer addition
+        idx: des105
+
+      # Sizing field ablations
+      - algorithm.sizing_field_interpolation_type: element_weighted_sum  # element-level piecewise-constant field
+        idx: sfd100
+      - algorithm.sizing_field_interpolation_type: interpolated_vertex  # vertex-level interpolation
+        idx: sfd101

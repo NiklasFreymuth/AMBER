@@ -1,0 +1,7 @@
+defaults:
+  - decoder: mlp
+  - _self_
+
+# abstract GNN base config
+latent_dimension: 64
+name: ???

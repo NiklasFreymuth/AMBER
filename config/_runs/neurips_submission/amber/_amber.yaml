@@ -1,0 +1,16 @@
+# @package _global_
+
+defaults:
+  - override /algorithm: amber
+  - override /logger: default_logger
+  - override /trainer: gpu_trainer
+  - _self_
+
+# Base configuration for AMBER experiments
+
+exp_name: ???
+
+hydra:
+  sweeper:
+    grid_params:
+      seed: 0, 1, 2, 3, 4

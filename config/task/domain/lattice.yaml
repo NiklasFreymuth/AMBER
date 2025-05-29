@@ -1,0 +1,6 @@
+dimension: 2
+domain_type: lattice
+min_holes: 5
+max_holes: 10
+min_hole_size: 0.04
+max_hole_size: 0.075

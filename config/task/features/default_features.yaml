@@ -1,0 +1,19 @@
+# "abstract" geometric features.
+# These can potentially be extended by task-specific features in, e.g., task/fem/poisson.yaml
+vertex:
+  x_position: False
+  y_position: False
+  z_position: False
+  degree: True
+  sizing_field: True
+element:
+  x_position: False
+  y_position: False
+  z_position: False
+  sizing_field: True
+pixel: ${task.features.element}
+edge:
+  distance_vector: False
+  euclidean_distance: True
+  edge_curvature: True
+add_self_edges: True

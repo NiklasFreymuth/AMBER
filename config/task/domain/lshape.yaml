@@ -1,0 +1,3 @@
+dimension: 2
+domain_type: lshape
+maximum_position_distortion: 0.3  # distortion for the l-shape

@@ -1,0 +1,13 @@
+
+
+sweep:
+  dir: ${base_dir}/training/${now:%Y-%m-%d}
+  subdir: ${exp_name}/${sub_dir_shortener:${hydra:job.override_dirname}, 3, False}/seed_${format:${seed}, '{:02d}'}
+run:
+  # Mimic sweep config layout for consistent save&load
+  dir: ${base_dir}/training/${now:%Y-%m-%d}/${exp_name}/singleton/seed_${format:${seed}, '{:02d}'}
+job:
+  config:
+    override_dirname:
+      exclude_keys:
+        - seed

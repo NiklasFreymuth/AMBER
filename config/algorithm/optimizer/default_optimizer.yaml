@@ -1,0 +1,7 @@
+name: ???
+lr: 1.0e-3  # learning rate
+weight_decay: 1.0e-6
+
+scheduler: linear_warmup_decay  # either "null"/False/None or the name of the scheduler to use. Supports
+# "linear_warmup_decay": Start with a learning rate of 0, then linearly increase it to the given learning rate over
+# the first 10% of the training steps, then decay it linearly to 0 over the remaining steps.

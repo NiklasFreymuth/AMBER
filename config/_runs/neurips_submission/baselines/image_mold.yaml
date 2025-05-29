@@ -1,0 +1,29 @@
+# @package _global_
+
+defaults:
+  - _image
+  - override /task: mold
+  - _self_
+
+exp_name: image_mold
+_version: 1
+
+
+trainer:
+  max_epochs: 401
+  checkpoint_frequency: 400
+task:
+  max_initial_element_volume: auto
+algorithm:
+  image_resolution: 96
+
+idx: iam100
+
+hydra:
+  sweeper:
+    ablative_params:
+      # Image baseline config below:
+      - algorithm.normalizer.normalize_inputs: 0
+        algorithm.normalizer.normalize_predictions: 0
+        algorithm.prediction_transform.inverse_transform_in_loss: False
+        idx: img100

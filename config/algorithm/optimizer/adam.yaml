@@ -1,0 +1,4 @@
+defaults:
+  - default_optimizer
+
+name: adam  # choose the Adam optimizer

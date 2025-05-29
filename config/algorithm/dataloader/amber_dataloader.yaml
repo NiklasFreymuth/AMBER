@@ -1,0 +1,19 @@
+defaults:
+  - default_dataloader
+  - _self_
+
+batch_size: 500000  # number of data points to process per training batch.
+# For AMBER, this refers to the number of graph nodes + number of graph edges.
+# For ImageAMBER, it is the number of images.
+# 500k nicely fits in 24GB of GPU memory for 20 MPN steps w/ latent dimension 64 at 99ish % capacity.
+
+max_size: 500
+add_strategy: stratified  # either "random" or "stratified".
+  # If "random", will add random samples to the buffer
+  # If "stratified", determines a valid depth first and then takes a sample with this depth
+max_mesh_depth: auto # maximum depth of the mesh to store in the buffer. Depth refers to the number of
+  # refinement steps that have been applied to the mesh, i.e., to the number of inference steps the algorithm
+  # has executed on the mesh. Will add new samples that never exceed this depth.
+  # "auto" sets this to inference_steps
+
+new_samples_per_epoch: 8  # number of new samples to add to the buffer per epoch. "auto" resolves to self.steps_per_epoch//8

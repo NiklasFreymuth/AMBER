@@ -1,0 +1,8 @@
+defaults:
+  - gmm
+  - _self_
+
+lower_covariance_bound: 0.0001  # minimum value of the isotropic covariance matrix
+upper_covariance_bound: 0.0005  # maximum value of the isotropic covariance matrix
+
+mean_position_range: 0.5  # maximum deviation range of the gmm mean from (0.5, 0.5)

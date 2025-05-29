@@ -1,0 +1,8 @@
+# Element-wise error-based refinement heuristic. Refine elements with error above a certain threshold.
+# Repeat for a certain number of steps, potentially smoothing the mesh after each step.
+smooth_mesh: True
+refinement_steps: 100
+error_threshold: 0.85  # threshold for the error metric.
+# If the error for an element is below this threshold, this element will not be refined
+# A lower threshold will thus lead to more refinement.
+step0_element_volume: 0.01  # initial volume of an element for the expert refinement heuristic

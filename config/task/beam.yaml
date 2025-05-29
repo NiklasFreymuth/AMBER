@@ -1,0 +1,17 @@
+defaults:
+  - default_task
+  - _self_
+
+
+name: beam
+num_data_points:
+  train: 20
+  val: 10
+  test: 20
+
+extensions:  # File extensions to figure out what to load
+  mesh: vtk
+  geometry: step
+max_initial_element_volume: 0.005
+
+

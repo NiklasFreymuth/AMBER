@@ -1,0 +1,15 @@
+defaults:
+  - task: ???
+  - algorithm: ???
+  - logger: default_logger
+  - trainer: gpu_trainer
+  - hydra: default_hydra
+  - _self_
+  - override hydra/sweeper: list
+
+base_dir: ./output/hydra
+exp_name: ???
+_version: 1  # Version of this specific experiment. Increment if you run different experiments with the same exp_name
+idx: "0"  # Identifier of the experiment.
+# Each semantic experiment ("Baseline with X parameters") should have a unique idx across all tasks and repetitions
+seed: 0

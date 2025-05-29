@@ -1,0 +1,13 @@
+defaults:
+  - default_gnn
+  - _self_
+
+name: graphmesh_gcn
+
+aggr: "mean"  # mean, add, max, min, prod
+latent_dimension: 128  # dimension of the latent space
+normalize: True  # whether to add self-loops and compute symmetric normalization coefficients on-the-fly.
+num_steps: 6  # number of message passing steps
+dropout: 0
+activation_function: leakyrelu  # activation function for the MLPs
+layer_norm: True  # which kind of layer normalization to use. null/None for no layer norm,

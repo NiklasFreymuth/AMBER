@@ -1,0 +1,39 @@
+# @package _global_
+
+defaults:
+  - _image
+  - override /task: laplace
+  - _self_
+
+exp_name: image_laplace
+_version: 1
+
+
+task:
+  max_initial_element_volume: auto
+
+idx: iam100
+
+hydra:
+  sweeper:
+    ablative_params:
+      # Image baseline config below:
+      - algorithm.normalizer.normalize_inputs: 0
+        algorithm.normalizer.normalize_predictions: 0
+        algorithm.prediction_transform.inverse_transform_in_loss: False
+        idx: img100
+
+      # "Ablations" towards image baseline
+      - algorithm.prediction_transform.inverse_transform_in_loss: False
+        idx: iam110
+      - algorithm.normalizer.normalize_inputs: 0
+        algorithm.normalizer.normalize_predictions: 0
+        idx: iam111
+
+      # Lower resolutions
+      - algorithm.image_resolution: 256
+        idx: iam112
+      - algorithm.image_resolution: 128
+        idx: iam113
+      - algorithm.image_resolution: 64
+        idx: iam114

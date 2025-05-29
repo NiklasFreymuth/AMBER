@@ -1,0 +1,65 @@
+defaults:
+  - architecture: ???
+  - dataloader: ???
+  - optimizer: adam
+  - normalizer: default_normalizer
+  - mesh_metrics: default_mesh_metrics
+  - _self_
+
+name: ???
+
+prediction_transform:
+  inverse_transform_in_loss: ???  # if True, will inverse transform the labels before computing the loss. This
+    # essentially means that the model learns in the inverse transformed space, such as the log of the sizing field.
+    # The predictions are then transformed during evaluation only to get the actual sizing field.
+  predict_residual: False  # If True, the model will predict the residual to the *current* sizing field, rather than the
+    # sizing field itself. This is useful if the current sizing field is already a good initial guess, such as for
+    # AMBER's iterative prediction
+  name: ???  # Either
+    # * False/"null" for no transform,
+    # "softplus" to make sure that the predicted fields are non-negative, or
+    # "exp" to learn log-sizing fields but predict the sizing field/compute the loss directly
+
+sizing_field_interpolation_type: ???  # How to interpolate the sizing field. Can be either a piecewise linear
+  # function on the vertices, defined as
+  # "interpolated_vertex" interpolate the vertex-level sizing field of the fine mesh to each vertex of the considered
+  #   intermediate mesh.
+  # "sampled_vertex" sample the vertex-level sizing field of the considered intermediate mesh by querying the containing
+  #   element of the fine mesh.
+
+  # or a piecewise constant function on the elements, given as
+  # "element_weighted_sum": For each coarse element, the sizing field equals the sum of the expert sizing field
+  #    evaluated at all elements whose midpoint is contained in the coarse element, times their volume. This
+  #    corresponds to a numerical integration of the expert sizing field over the coarse element.
+
+max_mesh_elements: auto # Maximum number of elements per mesh.
+  # During training, estimates the number of elements for a new mesh and creates it iff it is small enough
+  # May be
+  # * some integer, such as 15000 for meshes <=15k elements
+  # * "auto" to create meshes with up to max(expert_mesh_elements)*1.5 elements
+  # * "xN", where "x" is for "times" and N is some float, to allow max(expert_mesh_elements)*N elements.
+  # * None to disable this feature
+force_mesh_generation: True  # If True, the model will always generate a mesh, even if the number of elements is larger
+  # than the maximum number of elements. In this case, it will scale the sizing field down linearly until the resulting
+  # number of elements is predicted to fit.
+  # If False, the model will only generate a mesh if the number of elements is smaller than the maximum number of
+  # elements. This saves cost and does not skew the results
+
+
+gmsh:
+  min_sizing_field: x1.25
+  max_sizing_field: x1.25
+  # either a number that denotes the smallest/largest allowed edge length or "xFloat" to determine this value
+  # from sizing fields of the expert dataset. If "xFloat", the smallest/largest edge length of the expert dataset
+  # with a grace/an offset of the float will be used as the minimum/maximum edge length. E.g., x1.25 allows for
+  # Smaller elements of 80% of the minimum and 125% of the maximum size of the expert dataset.
+
+evaluation_frequency: 5  # only evaluate every 5th iteration to save some time
+# evaluation is pretty costly, as we have to generate a mesh (for one-step variants), or a series of meshes (for AMBER)
+# for each evaluation data point.
+plotting:
+  # Sub-dict for plotting utility
+  sample_idxs: [ 0, 1 ]  # indices of the dataset to use for plotting. Will only ever plot the evaluation/test data
+  # at these positions
+  frequency: 200  # How often to plot in terms of iterations/epochs. 100 means we plot after epoch 0, 100, 200, ...
+  initial_epoch: False  # If True, also plot at epoch 0. Else, skip the first plot

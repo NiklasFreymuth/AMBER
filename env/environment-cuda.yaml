@@ -1,0 +1,29 @@
+name: AMBER_neurips
+
+channels:
+  - default
+  - pytorch
+  - nvidia
+  - conda-forge
+
+dependencies:
+  - python=3.11
+  - numpy=1.26.4
+  - numba
+  - scipy
+  - scikit-learn
+  - wandb
+  - tqdm
+  - shapely
+  - meshio
+  - pydantic
+  - tikzplotlib=0.10.1
+  - pytorch=2.1.2
+  - pytorch-cuda=11.8
+  - torchvision
+  - torchaudio
+  - pip
+  - pre-commit
+  - hydra-submitit-launcher
+  - pip:
+      - -r ./requirements-pip.txt

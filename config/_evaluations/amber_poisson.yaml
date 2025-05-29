@@ -1,0 +1,21 @@
+# @package _global_
+
+defaults:
+  - ../_runs/amber: amber_poisson  # .yaml of the original experiment, including original configs
+  - _self_
+
+exp_suffix: to_eval/amber_poisson  # load a specific exp name at a specific date. This is the root path of the experiment
+# in the hydra logging
+task:
+  num_data_points:
+    # Non-empty to prevent issues during initialization
+    train: 1
+    val: 1
+
+loading:
+  save_figures: False
+last_step_damping:
+  do_last_step_damping: True
+  start: 0.5
+  stop: 2.0
+  num_steps: 20

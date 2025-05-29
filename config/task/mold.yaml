@@ -1,0 +1,21 @@
+defaults:
+  - default_task
+  - _self_
+
+
+name: mold  # 30.04.25. New default.
+num_data_points:
+  train: 54
+  val: 5
+  test: 10
+
+extensions: # File extensions to figure out what to load
+  mesh: vtk
+  geometry: step
+max_initial_element_volume: 0.0001
+
+inlet_features:  # Features about the inlet position for the molding.
+  vertex:
+    inlet_vertex: True
+  element:
+    inlet_element: True

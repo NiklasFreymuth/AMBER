@@ -1,0 +1,17 @@
+wandb:
+  enabled: True  # whether to use the wandb logger or not
+  entity: null  # name of the entity to log to. Will default to your private wandb account
+  project_name: AMBER  # name of the project
+  group_name: ${exp_name}
+  task_name: ${task.name}
+  run_name: seed_${seed}
+  job_type: ${sub_dir_shortener:${hydra:job.override_dirname}, 3, False}
+  tags:  # list of custom tags to sort/find these runs by
+    - ${task.name}
+    - ${algorithm.name}
+    - neurips_dev
+  use_env_wandb_dir: True  # whether to use the os environment's wandb directory or the default one.
+  # If True and such an environment variable is not set, the default directory will be used
+  start_method: "thread"  # start method for wandb. "thread" is recommended for slurm and on your cluster.
+  # null will use the default wandb start method,
+  # which is "fork" on linux and "spawn" on windows (according to copilot)

@@ -1,0 +1,16 @@
+# @package _global_
+
+defaults:
+  - override /hydra/launcher: submitit_slurm
+
+# Example config for a SLURM cluster platform using submitit. Adapt this to your needs.
+hydra:
+  mode: MULTIRUN  # needed for launcher to be used
+  launcher:
+    # launcher/cluster specific options
+    timeout_min: 8640 # in minutes
+    gres: gpu:1  # Request 1 GPU per task
+    mem_per_cpu: 7500  # 15gb (since we request 2 cpus per task)
+    exclude: node[1]  # example to not allocate on "node1"
+    additional_parameters:
+      cpus-per-task: 2  # request 2 gpus per task

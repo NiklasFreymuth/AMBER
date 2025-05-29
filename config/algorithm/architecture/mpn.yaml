@@ -1,0 +1,23 @@
+defaults:
+  - default_gnn
+  - _self_
+
+name: mpn  # use mpn architecture
+
+create_graph_copy: True  # whether to create a copy of the used graph before the forward pass or not
+assert_graph_shapes: False  # whether to assert correct shapes for the graph before each forward pass or not
+edge_dropout: 0.1  # dropout rate for the edges of the graph. Will remove the edge from the graph
+# with the given probability during training only
+stack:  # used for mpn
+  layer_norm: inner   # which kind of layer normalization to use. null/None for no layer norm,
+# "outer" for layer norm around each full message passing step, "inner" for layer norm after each message
+  num_steps: 20
+  residual_connections: inner
+  mlp:
+    activation_function: leakyrelu
+    num_layers: 2
+    add_output_layer: False
+    regularization:
+      dropout: 0
+      spectral_norm: False
+      latent_normalization: null

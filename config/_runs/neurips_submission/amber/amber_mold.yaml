@@ -1,0 +1,21 @@
+# @package _global_
+
+defaults:
+  - _amber
+  - override /task: mold
+  - _self_
+
+exp_name: amber_mold
+_version: 1
+
+trainer:
+  max_epochs: 401
+idx: amb100
+
+
+hydra:
+  sweeper:
+    ablative_params:
+      - task.max_initial_element_volume: 0.000001
+        algorithm.inference_steps: 1
+        idx: stp100

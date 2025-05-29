@@ -1,0 +1,14 @@
+defaults:
+  - features: default_features
+  - _self_
+
+
+name: ???
+max_initial_element_volume: ???
+sizing_field_interpolation_type: ${algorithm.sizing_field_interpolation_type}
+# Based on the sizing_field_interpolation_type, the observation graph and the sizing field
+# are constructed over mesh elements or vertices. The former is conceptually easier, the latter a bit faster
+# uses the below element_features or vertex_features for the observation graph, respectively.
+# We use vertices iff the sizing_field_interpolation_type is vertex and elements otherwise.
+# The other type of features are not used.
+

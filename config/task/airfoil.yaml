@@ -1,0 +1,17 @@
+defaults:
+  - default_task
+  - _self_
+
+
+name: airfoil
+num_data_points:
+  train: 20
+  val: 5
+  test: 5
+
+extensions:  # File extensions to figure out what to load
+  mesh: vtk
+  geometry: step
+max_initial_element_volume: 0.001
+
+

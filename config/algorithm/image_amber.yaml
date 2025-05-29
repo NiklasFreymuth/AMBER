@@ -1,0 +1,22 @@
+# like https://arxiv.org/pdf/2102.12923, but with a couple of important differences:
+#  - log_mse training
+#  - input and output normalization
+#  - equidistant pixels in image space, i.e., cubical pixels without squashing
+defaults:
+  - default_algorithm
+  - override dataloader: default_dataloader
+  - override architecture: unet
+  - _self_
+
+name: image_amber
+
+dataloader:
+  batch_size: 8
+
+prediction_transform:
+  inverse_transform_in_loss: True
+  predict_residual: False
+  name: softplus
+
+sizing_field_interpolation_type: pixel  # Must be "pixel", since we act on pixels for all image-based methods.
+image_resolution: 512  # The resolution of the image in the *longest* direction of the domain

@@ -1,0 +1,16 @@
+defaults:
+  - load_function: low_covariance_gmm
+  - _self_
+
+name: poisson  # either poisson, laplace, stokes_flow, linear_elasticity or heat_diffusion
+solution_dimension: 1  # dimension of the fem solution per vertex. 1 for scalar fields, >=2 for vector fields.
+
+
+pde_features:
+  vertex:
+    load_function: True
+    solution: True
+  element:
+    load_function: True
+    solution_mean: True
+    solution_std: True

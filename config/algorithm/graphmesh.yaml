@@ -1,0 +1,25 @@
+defaults:
+  - amber
+  - override architecture: graphmesh_gcn
+  - _self_
+
+name: graphmesh
+# For the graphmesh algorithm, we simply restrict a version of 1-step amber and add specific graphmesh features.
+
+
+prediction_transform:
+  inverse_transform_in_loss: False
+  predict_residual: False
+
+loss_type: mae
+sizing_field_interpolation_type: sampled_vertex
+initial_mesh_handling: exclude
+inference_steps: 1  # how often to repeat the refinement procedure for during evaluation.
+
+sizing_field_damping:
+  damping_factor: 0
+
+boundary_graph_features:
+  boundary_hop_distance: True
+  boundary_spatial_distance: True
+  boundary_mean_value_coordinates: True

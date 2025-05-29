@@ -1,0 +1,24 @@
+# @package _global_
+
+defaults:
+  - _image
+  - override /task: airfoil
+  - _self_
+
+exp_name: image_airfoil
+_version: 1
+
+
+task:
+  max_initial_element_volume: auto
+
+idx: iam100
+
+hydra:
+  sweeper:
+    ablative_params:
+      # Image baseline config below:
+      - algorithm.normalizer.normalize_inputs: 0
+        algorithm.normalizer.normalize_predictions: 0
+        algorithm.prediction_transform.inverse_transform_in_loss: False
+        idx: img100

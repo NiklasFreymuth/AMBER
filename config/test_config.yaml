@@ -1,0 +1,12 @@
+defaults:
+  - training_config
+  - _self_
+
+exp_suffix: ???
+
+loading:
+  save_figures: True  # if True, will save the figures of the evaluation as html files
+  enable_loading: True  # general flag if loading is enabled
+  checkpoint: last   # Choose between "best" and "last", or specify an epoch (has to be one of the saved epochs)
+  root_path: ${base_dir}/training/${exp_suffix}  # path to the root of the experiment
+  output_path: ${base_dir}/evaluation  # /${exp_name}
