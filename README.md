@@ -1,8 +1,8 @@
 # AMBER
 
-Code for AMBER: Adaptive Mesh Generation by Iterative Mesh Resolution Prediction.
+Code for [AMBER: Adaptive Mesh Generation by Iterative Mesh Resolution Prediction](http://arxiv.org/abs/2505.23663).
 
-For the earlier workshop version of AMBER, see the ```workshop``` branch and the corresponding [arXiv preprint](https://arxiv.org/abs/2406.14161).
+For the earlier [workshop version of AMBER](https://arxiv.org/abs/2406.14161), see the ```workshop``` branch.
 # Getting Started
 
 ## Setting up the environment
