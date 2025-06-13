@@ -206,7 +206,7 @@
           </p>
           <p>
             Here, the current mesh $M^t$ is first converted into a graph representation $G(M^t)$.
-            Our message passing network, $\text{MPN}_{\theta}$, processes this graph to predict vertex-level scalars, which are transformed into a discrete sizing field using some transformation $\sigma$.
+            The message passing network $\text{MPN}_{\theta}$, processes this graph to predict vertex-level scalars, which are transformed into a discrete sizing field using some transformation $\sigma$.
             This discrete field is then transformed into a smooth, continuous field by a linear interpolant, $\mathcal{I}_{M^t}$.
             The mesh generator, $g_\texttt{msh}$, uses this continuous field to produce the refined mesh for the next iteration, $M^{t+1}$.
             This iterative loop and the flexibility of the underlying message passing network allow AMBER to progressively focus its resolution on the most critical regions of a provided arbitrary geometry.
