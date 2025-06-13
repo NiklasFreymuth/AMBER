@@ -1,14 +1,14 @@
 # AMBER
 
-Code for AMBER: Adaptive Mesh Generation by Iterative Mesh Resolution Prediction.
+Code for [AMBER: Adaptive Mesh Generation by Iterative Mesh Resolution Prediction](http://arxiv.org/abs/2505.23663).
 
-For the earlier workshop version of AMBER, see the ```workshop``` branch and the corresponding [arXiv preprint](https://arxiv.org/abs/2406.14161).
+For the earlier [workshop version of AMBER](https://arxiv.org/abs/2406.14161), see the ```workshop``` branch.
 # Getting Started
 
 ## Setting up the environment
 
 ### Mamba
-This project uses mamba (https://github.com/conda-forge/miniforge)/conda (https://docs.conda.io/en/latest/) and pip for handling packages and dependencies.
+This project uses [mamba](https://github.com/conda-forge/miniforge) / [conda](https://docs.conda.io/en/latest/) and pip for handling packages and dependencies.
 To install mamba on Linux-like OSes use one of the commands below.
 
 ```
