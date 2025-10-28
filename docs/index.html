@@ -206,7 +206,7 @@
           </p>
           <p>
             Here, the current mesh $M^t$ is first converted into a graph representation $G(M^t)$.
-            The message passing network $\text{MPN}_{\theta}$, processes this graph to predict vertex-level scalars, which are transformed into a discrete sizing field using some transformation $\sigma$.
+            The message passing network $\text{MPN}_{\theta}$ processes this graph to predict vertex-level scalars, which are transformed into a discrete sizing field using some transformation $\sigma$.
             This discrete field is then transformed into a smooth, continuous field by a linear interpolant, $\mathcal{I}_{M^t}$.
             The mesh generator, $g_\texttt{msh}$, uses this continuous field to produce the refined mesh for the next iteration, $M^{t+1}$.
             This iterative loop and the flexibility of the underlying message passing network allow AMBER to progressively focus its resolution on the most critical regions of a provided arbitrary geometry.
@@ -273,6 +273,22 @@
           Estimated simulation error for different mesh resolutions on Poisson. <br>
           AMBER's meshes are on par with the expert that it learns from, while recent RL methods show worse performance and more variability. <br>
           AMBER can generalize to larger meshes during inference by scaling the predicted sizing field, maintaining mesh quality for over 100k elements.
+        </h2>
+      </div>
+      <div class="item">
+        <!-- Your image here -->
+        <img src="static/images/quanti_runtime.png" alt="Runtime comparison between AMBER and an expert heuristic"/>
+        <h2 class="subtitle has-text-centered">
+          Runtime comparison between AMBER and the expert heuristic used to generate its training meshes. <br>
+          AMBER achieves comparable mesh quality at a fraction of the runtime, especially for finer meshes.
+        </h2>
+      </div>
+      <div class="item">
+        <!-- Your image here -->
+        <img src="static/images/quanti_generalization.png" alt="Multi-task performance of AMBER"/>
+        <h2 class="subtitle has-text-centered">
+          Multi-task performance of AMBER trained simultaneously on Poisson (<i>hard</i>), Laplace and Airfoil, compared to training on each task individually.<br>
+          AMBER straightforwardly adapts to the multi-task setting, and is able to provide accurate meshes for different scenarios without sacrificing performance.
         </h2>
       </div>
   </div>
